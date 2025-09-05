@@ -3,12 +3,14 @@ package com.evlink;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @EnableScheduling
 @SpringBootApplication
+@PropertySource(value = {"classpath:/properties/config.properties"}, encoding = "UTF-8")
 public class EvlinkApplication {
 
 	public static void main(String[] args) {
