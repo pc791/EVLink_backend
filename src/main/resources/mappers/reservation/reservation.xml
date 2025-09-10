@@ -1,7 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
 <mapper namespace="com.evlink.domain.reservation.dao.ReservationDao">
 
+	<!-- 예약 시간 중복 확인 -->
+	<select id="checkReservationTime" parameterType="reservation" resultType="int">
+		SELECT
+		COUNT(*)
+		FROM
+		tb_reservation
+		WHERE
+		charger_id = #{chargerId}
+		AND res_date = #{resDate}
+		AND
+        (
+            (#{resStartTime} BETWEEN res_start_time AND res_end_time)
+            OR (#{resEndTime} BETWEEN res_start_time AND res_end_time)
+            OR (res_start_time BETWEEN #{resStartTime} AND #{resEndTime})
+            OR (res_end_time BETWEEN #{resStartTime} AND #{resEndTime})
+        )
+    	AND
+        res_status = 'R'
+	</select>
+
+	<!-- 예약 -->
+	<insert id="reservation" parameterType="reservation" useGeneratedKeys="true"
+		keyProperty="resId">
+		INSERT INTO tb_reservation (
+		charger_id, user_id, res_nm, res_tel, res_email,
+		res_date, res_start_time, res_end_time, pay_total_hour, res_status,
+		use_status
+		) VALUES (
+		#{chargerId}, #{userId}, #{resNm}, #{resTel}, #{resEmail},
+		#{resDate}, #{resStartTime}, #{resEndTime}, #{payTotalHour}, 'R', 'N'
+		)
+	</insert>
 	
+	<!-- 예약 취소로 상태업데이트 -->
+	<update id="reservationCancel" parameterType="long">
+		UPDATE tb_reservation
+		SET res_status = 'C'
+		WHERE res_id = #{resId}
+	</update>
+	
+	<!-- 예약 취소 상태인지 확인하기위함 -->
+	<select id="getResStatus" parameterType="long" resultType="String">
+        SELECT res_status
+        FROM tb_reservation
+        WHERE res_id = #{resId}
+    </select>
 </mapper>
