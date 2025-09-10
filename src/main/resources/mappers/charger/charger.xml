@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.evlink.domain.charger.dao.ChargerDao">
+
+	<!-- 충전소 중복 등록 확인 -->
+	<select id="checkChargerDuplicate" parameterType="charger"
+		resultType="int">
+		SELECT
+		COUNT(*)
+		FROM
+		tb_private_charger
+		WHERE
+		user_id = #{userId}
+	</select>
+	
+	<insert id="addCharger" parameterType="charger">		
+		INSERT INTO tb_private_charger (user_id, addr, addr_detail, charger_tel, latitude, longitude, charger_tp, charger_socket, open_time, close_time, res_yn, pay_hour, pay_total, remarks, operator, membership, supply_power, safe_charger_tel) VALUES (
+        #{userId}, #{addr}, #{addrDetail}, #{chargerTel}, #{latitude}, #{longitude}, #{chargerTp}, #{chargerSocket}, #{openTime}, #{closeTime}, "Y", #{payHour}, #{payTotal}, #{remarks}, #{operator}, #{membership}, #{supplyPower}, #{safeChargerTel})
+	</insert>
+
+	<update id="updateCharger" parameterType="charger"> 
+	    UPDATE tb_private_charger
+	    <set>
+			<if test="latitude != null">latitude = #{latitude},</if>
+			<if test="longitude != null">longitude = #{longitude},</if>
+			<if test="chargerTp != null">charger_tp = #{chargerTp},</if>
+			<if test="addr != null">addr = #{addr},</if>
+			<if test="addrDetail != null">addr_detail = #{addrDetail},</if>
+			<if test="chargerSocket != null">charger_socket = #{chargerSocket},</if>
+			<if test="openTime != null">open_time = #{openTime},</if>
+			<if test="closeTime != null">close_time = #{closeTime},</if>
+			<if test="resYn != null">res_yn = #{resYn},</if>
+			<if test="chargerTel != null">charger_tel = #{chargerTel},</if>
+			<if test="payHour != null">pay_hour = #{payHour},</if>
+			<if test="payTotal != null">pay_total = #{payTotal},</if>
+			<if test="remarks != null">remarks = #{remarks},</if>
+			<if test="operator != null">operator = #{operator},</if>
+			<if test="membership != null">membership = #{membership},</if>
+			<if test="supplyPower != null">supply_power = #{supplyPower}</if>
+		</set>
+		WHERE charger_id = #{chargerId} 
+	</update>
+
+	<delete id="deleteCharger" parameterType="long">
+		DELETE FROM tb_private_charger WHERE charger_id = #{chargerId}
+	</delete>
+	<!-- 예약시 충전 가능상태 확인 -->
+	<select id="getResYn" parameterType="long" resultType="String">
+        SELECT res_yn
+        FROM tb_private_charger
+        WHERE charger_id = #{chargerId}
+    </select>
+    
+    <!-- 예약 이메일알림 내용에서 주소 가져가기 -->
+    <select id="getChargerById" parameterType="long" resultType="charger">
+        SELECT
+        addr,
+        addr_detail AS addrDetail
+        FROM
+            tb_private_charger
+        WHERE
+            charger_id = #{chargerId}
+    </select>
+
+</mapper>
