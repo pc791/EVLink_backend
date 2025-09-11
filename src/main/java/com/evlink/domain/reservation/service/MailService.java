@@ -29,7 +29,7 @@ public class MailService {
 					+ "<p>예약자 : " + "<strong>" + rvo.getResNm() + "</strong></p>"
 					+ "<p>예약 날짜 : " + "<strong>" + rvo.getResDate() + "</strong></p>"
 					+ "<p>예약 시간 : " + "<strong>" + rvo.getResStartTime() + "</strong>" + " ~ " + "<strong>" + rvo.getResEndTime() + "</strong></p>"
-					+ "<p>결제 내역 : " + "<strong>" + rvo.getPayTotalHour() + "</strong></p>"
+					+ "<p>결제 내역 : " + "<strong>" + rvo.getPayTotalHour() + "</strong> 원</p>"
 					+ "</body>" + "</html>";
 			helper.setText(body, true);
 			mailSender.send(message);
