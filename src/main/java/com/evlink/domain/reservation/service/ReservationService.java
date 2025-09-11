@@ -1,5 +1,8 @@
 package com.evlink.domain.reservation.service;
 
+import java.time.Duration;
+import java.time.LocalTime;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,24 +21,63 @@ public class ReservationService {
 	private MailService mailService;
 
 	public int reservation(ReservationVO vo) {
+		// 예약을 위해 ChargerVO 정보 조회
+        ChargerVO chargerVO = chargerDao.getChargerById(vo.getChargerId());
+        
+        //충전소 정보 조회
+        if (chargerVO == null) {
+            throw new IllegalStateException("충전소 정보를 찾을 수 없습니다.");
+        }
+        
 		// 충전소의 예약 가능 여부(res_yn) 확인
-		String resYn = chargerDao.getResYn(vo.getChargerId());
-		if (resYn == null || !"Y".equals(resYn)) {
+		String resYn = chargerVO.getResYn();
+		if (!"Y".equals(resYn)) {
 			throw new IllegalStateException("예약이 불가능한 충전소입니다.");
-		}
+		}		
+        
+        // 충전소 운영 시간과 예약 시간 비교
+        LocalTime openTime = chargerVO.getOpenTime();
+        LocalTime closeTime = chargerVO.getCloseTime();
+        LocalTime resStartTime = vo.getResStartTime();
+        LocalTime resEndTime = vo.getResEndTime();
+
+        // 예약 시작 시간이 운영 시간 시작보다 빠르거나
+        // 예약 종료 시간이 운영 시간 종료보다 늦으면 예외 발생
+        if (resStartTime.isBefore(openTime) || resEndTime.isAfter(closeTime)) {
+            throw new IllegalStateException("예약 시간이 충전소 운영 시간을 벗어났습니다.");
+        }
+		
 		// 예약 시간 중복 확인
 		int conflictCount = reservationDao.checkReservationTime(vo);
 		if (conflictCount > 0) {
 			// 중복되는 예약이 있다면 예외 발생
 			throw new IllegalStateException("해당 시간에 이미 예약이 존재합니다.");
-		}
+		}		     
+
+        // 시간당 요금(payHour)과 예약 시간 계산
+        String payTotalStr = chargerVO.getPayTotal();
+
+        try {
+            int payTotal = Integer.parseInt(payTotalStr.replace(",", "").trim());
+            long hours = Duration.between(resStartTime, resEndTime).toHours();
+            if (hours <= 0) {
+                // 예약 종료 시간이 시작 시간보다 이전일 경우를 처리 (예: 자정을 넘어가는 예약)
+                hours = 24;
+            }
+            long payTotalHour = payTotal * hours;
+            
+            // 계산된 총 금액을 ReservationVO에 설정
+            vo.setPayTotalHour(String.valueOf(payTotalHour));
+        
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("시간당 요금 형식이 올바르지 않습니다.");
+        }
+
 		// 모든 검증 통과 후, 예약 등록 진행
         int result = reservationDao.reservation(vo);
 		// 예약 등록이 성공적으로 완료되면 이메일 알림 전송
         if (result > 0) {
-            String toEmail = vo.getResEmail();
-            // ChargerDao를 통해 ChargerVO 객체를 조회
-            ChargerVO chargerVO = chargerDao.getChargerById(vo.getChargerId());
+            String toEmail = vo.getResEmail();           
             try {
                 mailService.sendEmail(toEmail, vo, chargerVO);
             } catch (Exception e) {
