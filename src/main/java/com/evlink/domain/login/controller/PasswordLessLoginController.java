@@ -95,8 +95,8 @@ public class PasswordLessLoginController {
 		if(!id.equals("") && !pw.equals("")) {
 			
 			PasswordLessUserInfoVO userinfo = new PasswordLessUserInfoVO();
-			userinfo.setId(id);
-			userinfo.setPw(pw);
+			userinfo.setLogin_id(id);
+			userinfo.setLogin_pw(pw);
 			PasswordLessUserInfoVO newUserinfo = plLoginService.checkPassword(userinfo);
 			
 			boolean exist = false;
@@ -147,19 +147,17 @@ public class PasswordLessLoginController {
 	public Map<String, Object> join(
 			@RequestParam(value = "id", required = false) String id,
 			@RequestParam(value = "pw", required = false) String pw,
-			@RequestParam(value = "email", required = false) String email,
 			HttpServletRequest request) {
 	
 		if(id == null)		id = "";
 		if(pw == null)		pw = "";
-		if(email == null)	email = "";
 
 		Map<String, Object> mapResult = new HashMap<String, Object>();
 
-		if(!id.equals("") && !pw.equals("") && !email.equals("")) {
+		if(!id.equals("") && !pw.equals("")) {
 			
 			PasswordLessUserInfoVO userinfo = new PasswordLessUserInfoVO();
-			userinfo.setId(id);
+			userinfo.setLogin_id(id);
 			PasswordLessUserInfoVO newUserinfo = plLoginService.getUserInfo(userinfo);
 			
 			if(newUserinfo != null) {
@@ -168,8 +166,7 @@ public class PasswordLessLoginController {
 				mapResult.put("result", tmp_result.replace("@@@", id));
 			}
 			else {
-				userinfo.setPw(pw);
-				userinfo.setEmail(email);
+				userinfo.setLogin_pw(pw);
 				plLoginService.createUserInfo(userinfo);
 				log.info("join completed.");
 
@@ -196,7 +193,7 @@ public class PasswordLessLoginController {
 		if(!id.equals("")) {
 			
 			PasswordLessUserInfoVO userinfo = new PasswordLessUserInfoVO();
-			userinfo.setId(id);
+			userinfo.setLogin_id(id);
 			plLoginService.withdrawUserInfo(userinfo);
 			
 			session.setAttribute("id", null);
@@ -223,7 +220,7 @@ public class PasswordLessLoginController {
 		if(!id.equals("") && !pw.equals("")) {
 			
 			PasswordLessUserInfoVO userinfo = new PasswordLessUserInfoVO();
-			userinfo.setId(id);
+			userinfo.setLogin_id(id);
 			PasswordLessUserInfoVO newUserinfo = plLoginService.getUserInfo(userinfo);
 			
 			if(newUserinfo == null) {
@@ -232,7 +229,7 @@ public class PasswordLessLoginController {
 				mapResult.put("result", tmp_result.replace("@@@", id));
 			}
 			else {
-				userinfo.setPw(pw);
+				userinfo.setLogin_pw(pw);
 				plLoginService.changepw(userinfo);
 				log.info("changepw completed.");
 
@@ -282,8 +279,8 @@ public class PasswordLessLoginController {
 		if(!id.equals("") && !pw.equals("")) {
 			
 			PasswordLessUserInfoVO userinfo = new PasswordLessUserInfoVO();
-			userinfo.setId(id);
-			userinfo.setPw(pw);
+			userinfo.setLogin_id(id);
+			userinfo.setLogin_pw(pw);
 			PasswordLessUserInfoVO newUserinfo = plLoginService.checkPassword(userinfo);
 			
 			if(newUserinfo != null) {
@@ -379,7 +376,7 @@ public class PasswordLessLoginController {
 		}
 		
 		PasswordLessUserInfoVO userinfo = new PasswordLessUserInfoVO();
-		userinfo.setId(userId);
+		userinfo.setLogin_id(userId);
 		PasswordLessUserInfoVO newUserinfo = plLoginService.getUserInfo(userinfo);
 		
 		if(newUserinfo == null) {
@@ -468,8 +465,8 @@ public class PasswordLessLoginController {
 					    	  // Change password after QR registration is complete
 					    	log.info("passwordlessCallApi : QR Registration Complete --> Change Password");
 					    	String newPw = Long.toString(System.currentTimeMillis()) + ":" + userId;
-							userinfo.setId(userId);
-							userinfo.setPw(newPw);
+							userinfo.setLogin_id(userId);
+							userinfo.setLogin_pw(newPw);
 							plLoginService.changepw(userinfo);
 					    }
 					}
@@ -496,8 +493,8 @@ public class PasswordLessLoginController {
 					    	log.info("passwordlessCallApi : Login Success --> Change Password");
 							String newPw = Long.toString(System.currentTimeMillis()) + ":" + userId;
 							userinfo = new PasswordLessUserInfoVO();
-							userinfo.setId(userId);
-							userinfo.setPw(newPw);
+							userinfo.setLogin_id(userId);
+							userinfo.setLogin_pw(newPw);
 							plLoginService.changepw(userinfo);
 							
 							session.setAttribute("id", userId);
