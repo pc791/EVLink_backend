@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Alias("plUserInfo")
 public class PasswordLessUserInfoVO {
-	private String id;
-	private String pw;
-	private String email;
-	private Date regdate;
+	private String login_id;
+	private String login_pw;
+	private String join_type;
+	private Date reg_dt;
 }
