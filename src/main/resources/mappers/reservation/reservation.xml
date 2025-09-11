@@ -13,10 +13,14 @@
 		AND res_date = #{resDate}
 		AND
         (
-            (#{resStartTime} BETWEEN res_start_time AND res_end_time)
-            OR (#{resEndTime} BETWEEN res_start_time AND res_end_time)
-            OR (res_start_time BETWEEN #{resStartTime} AND #{resEndTime})
-            OR (res_end_time BETWEEN #{resStartTime} AND #{resEndTime})
+            -- Case 1: 새로운 예약의 시작 시간이 기존 예약 시간 범위 안에 있는 경우
+            (res_start_time &lt;= #{resStartTime} AND res_end_time &gt; #{resStartTime})
+            OR
+            -- Case 2: 새로운 예약의 종료 시간이 기존 예약 시간 범위 안에 있는 경우
+            (res_start_time &lt; #{resEndTime} AND res_end_time &gt;= #{resEndTime})
+            OR
+            -- Case 3: 기존 예약 시간이 새로운 예약 시간을 완전히 포함하는 경우
+            (res_start_time &gt;= #{resStartTime} AND res_end_time &lt;= #{resEndTime})
         )
     	AND
         res_status = 'R'

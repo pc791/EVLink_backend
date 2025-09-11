@@ -2,12 +2,14 @@ package com.evlink.domain.charger.controller;
 
 import java.time.LocalTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -24,7 +26,15 @@ public class ChargerController {
 
 	@Autowired
 	private ChargerService chargerService;
-
+	
+	// 충전소 전체 목록 조회
+    // URL: GET http://localhost:80/evlink/api/charger/list
+    @GetMapping("/list")
+    public ResponseEntity<List<ChargerVO>> getAllChargers() {
+        List<ChargerVO> chargerList = chargerService.getAllChargers();
+        return ResponseEntity.ok(chargerList);
+    }
+	
 	// 개인 충전소 등록
 	@PostMapping("/add")
 	public ResponseEntity<Map<String, Object>> addCharger(@RequestBody ChargerVO vo) {

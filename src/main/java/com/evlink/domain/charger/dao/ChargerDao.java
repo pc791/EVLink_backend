@@ -1,5 +1,7 @@
 package com.evlink.domain.charger.dao;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -24,4 +26,7 @@ public interface ChargerDao {
 	
 	//메일 알림시 충전소 조회
 	ChargerVO getChargerById(@Param("chargerId") long chargerId);
+	
+	//마커뿌리기 위한 충전기조회
+	List<ChargerVO> getAllChargers();
 }
