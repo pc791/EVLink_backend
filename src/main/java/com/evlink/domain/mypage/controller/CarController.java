@@ -44,7 +44,7 @@ public class CarController {
 			carService.addCar(vo);
 
 			response.put("success", true);
-			response.put("message", "차량등록 성공");
+			response.put("message", "차량 등록 성공");
 			return ResponseEntity.ok(response);
 		} catch (Exception e) {
 			response.put("success", false);
@@ -74,22 +74,22 @@ public class CarController {
 	}
 	
 	// 등록차량 삭제
-		@DeleteMapping("/{car_id}")
-		public ResponseEntity<Map<String, Object>> deleteCharger(@PathVariable("car_id") int car_id) {
-			Map<String, Object> response = new HashMap<>();
+	@DeleteMapping("/{car_id}")
+	public ResponseEntity<Map<String, Object>> deleteCharger(@PathVariable("car_id") int car_id) {
+		Map<String, Object> response = new HashMap<>();
 
-			int deletedRows = carService.deleteCar(car_id);
+		int deletedRows = carService.deleteCar(car_id);
 
-			if (deletedRows > 0) {
-				response.put("success", true);
-				response.put("message", "차량정보 삭제 성공!");
-				return ResponseEntity.ok(response);
-			} else {
-				response.put("success", false);
-				response.put("message", "삭제하려는 차량정보가 존재하지 않습니다.");
-				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-			}
+		if (deletedRows > 0) {
+			response.put("success", true);
+			response.put("message", "차량정보 삭제 성공!");
+			return ResponseEntity.ok(response);
+		} else {
+			response.put("success", false);
+			response.put("message", "삭제하려는 차량정보가 존재하지 않습니다.");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
 		}
+	}
 
 	// 등록차량 조회
 	@GetMapping("/{user_id}")

@@ -41,6 +41,10 @@ public class CarService {
 
 	// 차량정보 삭제
 	public int deleteCar(int car_id) {
-		return carDao.deleteCar(car_id);
+		int resultValue = carDao.deleteCar(car_id);
+		CarVO vo = new CarVO();
+		vo.setCar_id(car_id);
+		carDao.callUserTpUpdate(vo);
+		return resultValue;
 	}
 }

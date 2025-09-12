@@ -91,7 +91,11 @@ public class ChargerService {
 	}
 
 	public int deleteCharger(long chargerId) {
-		return chargerDao.deleteCharger(chargerId);
+		int resultValue = chargerDao.deleteCharger(chargerId);
+		ChargerVO vo = new ChargerVO();
+		vo.setChargerId(chargerId);
+		chargerDao.callUserTpUpdate(vo);
+		return resultValue;
 	}
 	
 	public List<ChargerVO> getAllChargers() {
