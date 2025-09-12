@@ -55,22 +55,20 @@
 		DELETE FROM tb_private_charger WHERE charger_id = #{chargerId}
 	</delete>
 	
-	<!-- 예약시 충전 가능상태 확인 -->
-	<select id="getResYn" parameterType="long" resultType="String">
-        SELECT res_yn
-        FROM tb_private_charger
-        WHERE charger_id = #{chargerId}
-    </select>
-    
-    <!-- 예약 이메일알림 내용에서 주소 가져가기 -->
+	<!-- 예약시 충전소 정보 가져오기 -->
     <select id="getChargerById" parameterType="long" resultType="charger">
-        SELECT
-        addr,
-        addr_detail AS addrDetail
-        FROM
-            tb_private_charger
-        WHERE
-            charger_id = #{chargerId}
+		SELECT
+		addr,
+		addr_detail AS addrDetail,
+		open_time AS openTime,
+		close_time AS closeTime,
+		res_yn AS resYn,
+		pay_hour AS payHour,
+		pay_total AS payTotal
+		FROM
+		tb_private_charger
+		WHERE
+		charger_id = #{chargerId}
     </select>
     
     <!-- 프론트 마커 뿌리기용 충전소 조회 -->
