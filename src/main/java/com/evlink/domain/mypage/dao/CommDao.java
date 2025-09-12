@@ -11,4 +11,6 @@ public interface CommDao {
 	CommVO getUserComm(int user_id);
 	// 공통사항 저장
 	int setUserComm(CommVO vo);
+	// 프로시저 호출
+	void callUserTpUpdate(CommVO vo);
 }

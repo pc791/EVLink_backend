@@ -5,6 +5,7 @@ import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.evlink.domain.mypage.dao.ChargerDao;
 import com.evlink.domain.mypage.vo.ChargerVO;
@@ -20,6 +21,7 @@ public class ChargerService {
 //	@Autowired
 //	private UserDao userDao; // user_tp 업데이트
 
+	@Transactional
 	public void addCharger(ChargerVO vo) {
 		// 1. 충전기 중복등록 확인
 		int conflictCount = chargerDao.checkChargerDuplicate(vo);
@@ -28,7 +30,7 @@ public class ChargerService {
 			// 한아이디로 충전기를 중복등록 한다면 예외 발생
 			throw new IllegalStateException("이미 충전기를 등록했습니다.");
 		}
-//		// 2. 주소(addr)를 이용하여 위도(lat), 경도(lng) 자동 설정
+		// 2. 주소(addr)를 이용하여 위도(lat), 경도(lng) 자동 설정
 		try {
 			String address = vo.getAddr();
 			String addrDetail = vo.getAddrDetail();
@@ -57,8 +59,11 @@ public class ChargerService {
 		// 생성된 값을 VO 객체에 설정
 		vo.setSafeChargerTel(safeChargerTel);
 		chargerDao.addCharger(vo);
+		chargerDao.callUserTpUpdate(vo);
+		
 	}
 
+	@Transactional
 	public int updateCharger(ChargerVO vo) {
 		try {
 			String address = vo.getAddr();
@@ -80,7 +85,9 @@ public class ChargerService {
 			e.printStackTrace();
 			throw new IllegalStateException("주소 변환에 실패했습니다. 유효한 주소를 입력해주세요.");
 		}
-		return chargerDao.updateCharger(vo);
+		int resultValue = chargerDao.updateCharger(vo);
+		chargerDao.callUserTpUpdate(vo);
+		return resultValue;
 	}
 
 	public int deleteCharger(long chargerId) {

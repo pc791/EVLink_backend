@@ -20,4 +20,7 @@ public interface CarDao {
 
 	// 차량정보 삭제
 	int deleteCar(int car_id);
+	
+	// 프로시저 호출
+	void callUserTpUpdate(CarVO vo);
 }

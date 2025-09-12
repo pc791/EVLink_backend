@@ -36,4 +36,5 @@ public class ChargerVO {
 	private LocalDateTime regDt;
 	private LocalDateTime updDt;
 	private String safeChargerTel;
+	private String user_tp;
 }

@@ -37,8 +37,8 @@ public class CarController {
 	public ResponseEntity<Map<String, Object>> addCharger(@RequestBody CarVO vo) {
 		Map<String, Object> response = new HashMap<>();
 
-		System.out.println("Received VO : " + vo.toString());
-		System.out.println("User ID : " + vo.getUser_id());
+		// System.out.println("Received VO : " + vo.toString());
+		// System.out.println("User ID : " + vo.getUser_id());
 		try {
 			
 			carService.addCar(vo);
@@ -64,7 +64,7 @@ public class CarController {
 
 		if (updatedRows > 0) {
 			response.put("success", true);
-			response.put("message", "차량정보 수정 성공!");
+			response.put("message", "차량정보를 수정하였습니다.");
 			return ResponseEntity.ok(response);
 		} else {
 			response.put("success", false);

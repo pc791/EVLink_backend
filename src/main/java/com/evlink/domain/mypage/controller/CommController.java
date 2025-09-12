@@ -43,12 +43,12 @@ public class CommController {
 	@PostMapping("/save")
 	public ResponseEntity<Map<String, Object>> setUserInfo(HttpSession session, HttpServletRequest request, @RequestBody CommVO vo) {
 		Map<String, Object> response = new HashMap<>();
-		
+		// System.out.println(vo.toString());
 		int updatedRows = commService.setUserComm(vo);
 		
 		if (updatedRows > 0) {
 			response.put("success", true);
-			response.put("message", "공통사항 저장 성공");
+			response.put("message", "공통사항을 수정하였습니다.");
 			return ResponseEntity.ok(response);
 		} else {
 			response.put("success", false);

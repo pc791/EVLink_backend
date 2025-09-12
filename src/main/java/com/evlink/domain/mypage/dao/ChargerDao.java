@@ -32,4 +32,7 @@ public interface ChargerDao {
 	
 	//마커뿌리기 위한 충전기조회
 	List<ChargerVO> getAllChargers();
+	
+	// 프로시저 호출
+		void callUserTpUpdate(ChargerVO vo);
 }
