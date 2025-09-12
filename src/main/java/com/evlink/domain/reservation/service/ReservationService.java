@@ -6,8 +6,8 @@ import java.time.LocalTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.evlink.domain.charger.dao.ChargerDao;
-import com.evlink.domain.charger.vo.ChargerVO;
+import com.evlink.domain.mypage.dao.ChargerDao;
+import com.evlink.domain.mypage.vo.ChargerVO;
 import com.evlink.domain.reservation.dao.ReservationDao;
 import com.evlink.domain.reservation.vo.ReservationVO;
 

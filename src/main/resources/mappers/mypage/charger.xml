@@ -72,5 +72,24 @@
         WHERE
             charger_id = #{chargerId}
     </select>
+    <select id="getAllChargers" resultType="charger">
+		SELECT
+		charger_id AS chargerId,
+		user_id AS userId,
+		addr,
+		addr_detail AS addrDetail,
+		latitude,
+        longitude, 
+		charger_tp AS chargerTp,
+		charger_socket AS chargerSocket,
+		open_time AS openTime,
+		close_time AS closeTime,
+		res_yn AS resYn,
+		pay_total AS payTotal,
+		remarks,
+		safe_charger_tel AS safeChargerTel
+		FROM
+		tb_private_charger
+	</select>
 
 </mapper>
