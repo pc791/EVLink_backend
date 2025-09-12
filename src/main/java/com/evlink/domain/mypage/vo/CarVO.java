@@ -16,4 +16,5 @@ public class CarVO {
 	private String car_socket;
 	private String reg_dt;
 	private String upd_dt;
+	private String user_tp;
 }

@@ -18,6 +18,7 @@ public class CarService {
 	}
 		
 	// 차량등록
+	@Transactional
 	public void addCar(CarVO vo) {
 		int count = carDao.checkCarDuplicate(vo.getUser_id());
 		
@@ -26,15 +27,24 @@ public class CarService {
 		} 
 		
 		carDao.addCar(vo);
+		carDao.callUserTpUpdate(vo);
+		
 	}
 		
 	// 차량정보 수정
+	@Transactional
 	public int updateCar(CarVO vo) {
-		return carDao.updateCar(vo);
+		int resultValue = carDao.updateCar(vo);
+		carDao.callUserTpUpdate(vo);
+		return resultValue;
 	}
 
 	// 차량정보 삭제
 	public int deleteCar(int car_id) {
-		return carDao.deleteCar(car_id);
+		int resultValue = carDao.deleteCar(car_id);
+		CarVO vo = new CarVO();
+		vo.setCar_id(car_id);
+		carDao.callUserTpUpdate(vo);
+		return resultValue;
 	}
 }

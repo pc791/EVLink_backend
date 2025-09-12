@@ -52,4 +52,65 @@
         FROM tb_reservation
         WHERE res_id = #{resId}
     </select>
+    
+	<!-- 예약리스트 조회 -->
+    <select id="reservationList" parameterType="map" resultType="map">
+        SELECT * 
+          FROM (SELECT tr.res_id, tr.charger_id, tr.user_id, tr.res_nm, tr.res_tel, tr.res_email, tr.res_date, tr.res_start_time, tr.res_end_time, tr.pay_total_hour, tr.res_status, tr.use_status, tr.reg_dt,
+                       (select tuc.car_model from tb_user_car tuc where tr.user_id = tuc.user_id) as car_model,
+                       (select tpc.addr||' '||tpc.addr_detail from tb_private_charger tpc where tr.charger_id = tpc.charger_id) as chager_addr,
+                       ROW_NUMBER() OVER(ORDER BY reg_dt DESC) AS ROW_NUM
+                  FROM tb_reservation tr
+                <where>
+                     <choose>
+                        <when test="viewType == 'provider'">
+                            tr.charger_id = (SELECT charger_id
+                                                  FROM tb_private_charger
+                                                 WHERE user_id = #{user_id})
+                            <if test="searchType != null and searchValue != null">
+                                <choose>
+                                     <when test="searchType == 1">
+                                        AND tr.res_nm LIKE '%'||#{searchValue}||'%'
+                                     </when>
+                                     <when test="searchType == 2">
+                                        AND car_model LIKE '%'||#{searchValue}||'%'
+                                     </when>
+                                </choose>
+                            </if>
+                        </when>
+                        <otherwise>
+                            tr.user_id = #{user_id}
+                            <if test="searchType != null and searchValue != null">
+                                <choose>
+                                     <when test="searchType == 1">
+                                        AND tr.chager_addr LIKE '%'||#{searchValue}||'%'
+                                     </when>
+                                </choose>
+                            </if>
+                        </otherwise>
+                     </choose>
+                </where>
+               ) R
+        WHERE 1=1
+        AND R.ROW_NUM BETWEEN #{begin} AND #{end}
+    </select>
+    
+    <!-- 예약리스트 총 건수 조회 -->
+    <select id="totalCount" parameterType="map" resultType="int">
+        SELECT COUNT(*) AS TOTALCOUNT
+        FROM tb_reservation
+        <where>
+             <choose>
+                <when test="viewType == 'provider'">
+                    charger_id = (SELECT charger_id
+                                          FROM tb_private_charger
+                                         WHERE user_id = #{user_id})
+                </when>
+                <otherwise>
+                    user_id = #{user_id}
+                </otherwise>
+             </choose>
+        </where>
+    </select>
+    
 </mapper>

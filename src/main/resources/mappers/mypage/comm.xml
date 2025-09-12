@@ -21,4 +21,8 @@
         </set>
          WHERE user_id = #{user_id}
     </update>
+    
+    <select id="callUserTpUpdate" statementType="CALLABLE" parameterType="mpuser">
+        {call UPDATE_USER_TP(#{user_id, mode=IN, jdbcType=BIGINT})}
+    </select>
 </mapper>

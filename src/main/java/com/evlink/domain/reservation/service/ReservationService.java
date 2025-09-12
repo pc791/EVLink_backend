@@ -2,6 +2,8 @@ package com.evlink.domain.reservation.service;
 
 import java.time.Duration;
 import java.time.LocalTime;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,6 +12,8 @@ import com.evlink.domain.mypage.dao.ChargerDao;
 import com.evlink.domain.mypage.vo.ChargerVO;
 import com.evlink.domain.reservation.dao.ReservationDao;
 import com.evlink.domain.reservation.vo.ReservationVO;
+
+
 
 @Service
 public class ReservationService {
@@ -95,5 +99,14 @@ public class ReservationService {
 			throw new IllegalStateException("이미 취소된 예약입니다.");
 		}
 		return reservationDao.reservationCancel(resId);
+	}
+	
+	// customer/provider select list
+	public List<Map<String, Object>> reservationList(Map<String, String> map) {
+		return reservationDao.reservationList(map);
+	}
+	
+	public int totalCount(Map<String, String> map) {
+		return reservationDao.totalCount(map);
 	}
 }

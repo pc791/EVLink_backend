@@ -11,7 +11,8 @@
     
     <!-- 차량정보 조회 -->
     <select id="getCar" parameterType="int" resultType="mpcar">
-        SELECT car_id, user_id, car_plate, car_mf, car_model, car_year, car_socket, reg_dt, upd_dt
+        SELECT car_id, user_id, car_plate, car_mf, car_model, car_year, car_socket, reg_dt, upd_dt,
+               (SELECT user_tp FROM tb_user WHERE user_id = #{user_id}) as user_tp
           FROM tb_user_car
          WHERE user_id = #{user_id} 
     </select>
@@ -40,4 +41,8 @@
     <delete id="deleteCar" parameterType="int">
         DELETE FROM tb_user_car WHERE car_id = #{car_id}
     </delete>
+    
+    <select id="callUserTpUpdate" statementType="CALLABLE" parameterType="mpcar">
+        {call UPDATE_USER_TP(#{user_id, mode=IN, jdbcType=BIGINT})}
+    </select>
 </mapper>

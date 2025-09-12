@@ -13,9 +13,10 @@
 	
 	<!-- 충전소정보 조회 -->
 	<select id="getCharger" parameterType="long" resultType="charger">
-	   SELECT charger_id as chargerId, user_id as user, addr, addr_detail as addrDetail, charger_tel as chargerTel,
+	   SELECT charger_id as chargerId, user_id as userId, addr, addr_detail as addrDetail, charger_tel as chargerTel,
               charger_tp as chargerTp, charger_socket as chargerSocket, supply_power as supplyPower, operator, membership,
-              open_time as openTime, close_time as closeTime, res_yn as resYn, pay_hour as payHour, pay_total as payTotal, remarks
+              open_time as openTime, close_time as closeTime, res_yn as resYn, pay_hour as payHour, pay_total as payTotal, remarks,
+              (SELECT user_tp FROM tb_user WHERE user_id = #{userId}) as user_tp
 	     FROM
 	     tb_private_charger
          WHERE
@@ -55,24 +56,24 @@
 		DELETE FROM tb_private_charger WHERE charger_id = #{chargerId}
 	</delete>
 	
-	<!-- 예약시 충전 가능상태 확인 -->
-	<select id="getResYn" parameterType="long" resultType="String">
-        SELECT res_yn
-        FROM tb_private_charger
-        WHERE charger_id = #{chargerId}
+	<!-- 예약시 충전소 정보 가져오기 -->
+    <select id="getChargerById" parameterType="long" resultType="charger">
+		SELECT
+		addr,
+		addr_detail AS addrDetail,
+		open_time AS openTime,
+		close_time AS closeTime,
+		res_yn AS resYn,
+		pay_hour AS payHour,
+		pay_total AS payTotal
+		FROM
+		tb_private_charger
+		WHERE
+		charger_id = #{chargerId}
     </select>
     
-    <!-- 예약 이메일알림 내용에서 주소 가져가기 -->
-    <select id="getChargerById" parameterType="long" resultType="charger">
-        SELECT
-        addr,
-        addr_detail AS addrDetail
-        FROM
-            tb_private_charger
-        WHERE
-            charger_id = #{chargerId}
-    </select>
-    <select id="getAllChargers" resultType="charger">
+    <!-- 프론트 마커 뿌리기용 충전소 조회 -->
+	<select id="getAllChargers" resultType="charger">
 		SELECT
 		charger_id AS chargerId,
 		user_id AS userId,
@@ -92,4 +93,7 @@
 		tb_private_charger
 	</select>
 
+    <select id="callUserTpUpdate" statementType="CALLABLE" parameterType="charger">
+        {call UPDATE_USER_TP(#{userId, mode=IN, jdbcType=BIGINT})}
+    </select>
 </mapper>

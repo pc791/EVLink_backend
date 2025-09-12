@@ -46,8 +46,8 @@ public class ChargerController {
 	public ResponseEntity<Map<String, Object>> addCharger(@RequestBody ChargerVO vo) {
 		Map<String, Object> response = new HashMap<>();
 
-		System.out.println("Received VO : " + vo.toString());
-		System.out.println("User ID : " + vo.getUserId());
+		// System.out.println("Received VO : " + vo.toString());
+		// System.out.println("User ID : " + vo.getUserId());
 		try {
 			// 시작 시간이 종료 시간보다 늦은지 검증
 			LocalTime openTime = vo.getOpenTime();
@@ -91,7 +91,7 @@ public class ChargerController {
 
 		if (updatedRows > 0) {
 			response.put("success", true);
-			response.put("message", "개인 충전소 정보 수정 성공!");
+			response.put("message", "개인충전소 정보를 수정하였습니다.");
 			return ResponseEntity.ok(response);
 		} else {
 			response.put("success", false);

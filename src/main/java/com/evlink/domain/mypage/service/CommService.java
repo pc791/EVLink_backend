@@ -18,7 +18,10 @@ public class CommService {
 	}
 	
 	// 공통사항 저장
+	@Transactional
 	public int setUserComm(CommVO vo) {
-		return commDao.setUserComm(vo);
+		int resultValue = commDao.setUserComm(vo);
+		commDao.callUserTpUpdate(vo);
+		return resultValue;
 	}
 }
