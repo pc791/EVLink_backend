@@ -6,6 +6,8 @@ import java.time.LocalTime;
 
 import org.apache.ibatis.type.Alias;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Data;
 
 
@@ -19,7 +21,9 @@ public class ReservationVO {
 	private String resTel;
 	private String resEmail;
 	private Date resDate;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
 	private LocalTime resStartTime;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
 	private LocalTime resEndTime;	
 	private String payTotalHour;
 	private String resStatus;
