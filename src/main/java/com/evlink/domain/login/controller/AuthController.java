@@ -1,7 +1,7 @@
-// src/main/java/kr/co/ictedu/teamcfinal/login/AuthController.java
-package kr.co.ictedu.teamcfinal.login;
+package com.evlink.domain.login.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -32,6 +32,7 @@ public class AuthController {
 
     @GetMapping("/kakao")
     public ResponseEntity<Map<String, String>> kakao() {
+    	System.out.println("전송");
         return ResponseEntity.ok(Map.of("url", ctxBase() + "/oauth2/authorization/kakao"));
     }
 

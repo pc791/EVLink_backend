@@ -1,4 +1,4 @@
-package kr.co.ictedu.teamcfinal.VO;
+package com.evlink.domain.login.vo;
 
 import lombok.Builder;
 import lombok.Data;
