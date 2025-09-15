@@ -15,22 +15,28 @@ import jakarta.mail.internet.MimeMessage;
 public class MailService {
 	@Autowired
 	private JavaMailSender mailSender;
-	
+
 	public void sendEmail(String toEmail, ReservationVO rvo, ChargerVO cvo) {
 		MimeMessage message = mailSender.createMimeMessage();
-		
+
 		try {
 			MimeMessageHelper helper = new MimeMessageHelper(message, true);
 			helper.setFrom("akdlrhfna@naver.com");
 			helper.setTo(toEmail);
 			helper.setSubject("EVLink 예약 알림 서비스");
-			String body = "<html>" + "<body>" + "<h1>EVLink 예약에 대한 알림 내용입니다.</h1>"
+			// 로컬 환경 테스트용 URL
+			String linkUrl = "http://localhost:3000";
+			String imageUrl = "http://localhost:3000/images/EVLink_logo.png";
+
+			String body = "<html>"	+ "<body>"
+					+ "<h1>충전소 예약에 대한 알림 서비스입니다.</h1>"
 					+ "<p>충전소 위치 : " + "<strong>" + cvo.getAddr() + " " + cvo.getAddrDetail() + "</strong></p>"
-					+ "<p>예약자 : " + "<strong>" + rvo.getResNm() + "</strong></p>"
+					+ "<p>예약자 : " + "<strong>" + rvo.getResNm() + "</strong></p>" 
 					+ "<p>예약 날짜 : " + "<strong>" + rvo.getResDate() + "</strong></p>"
 					+ "<p>예약 시간 : " + "<strong>" + rvo.getResStartTime() + "</strong>" + " ~ " + "<strong>" + rvo.getResEndTime() + "</strong></p>"
 					+ "<p>결제 내역 : " + "<strong>" + rvo.getPayTotalHour() + "</strong> 원</p>"
-					+ "</body>" + "</html>";
+					+ "<a href=\"" + linkUrl + "\">" + "<img src=\"" + imageUrl	+ "\" alt=\"결제 내역 메일링크\" style=\"width:150px; height:auto; border:0;\" />" + "</a>"
+					+ "</body>"	+ "</html>";
 			helper.setText(body, true);
 			mailSender.send(message);
 		} catch (MessagingException e) {
