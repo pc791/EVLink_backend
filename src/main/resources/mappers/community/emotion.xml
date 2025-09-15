@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.evlink.domain.community.dao.EmotionDao">
+  <!-- 리스트 (페이징) -->
+  <select id="showList" parameterType="java.util.Map" resultType="bovo">
+    SELECT emo_id, user_id, title, hit, reg_dt, emotion
+    FROM tb_emotion
+    <where>
+      <trim prefix="" prefixOverrides="AND |OR ">
+        <if test="searchValue != null and searchValue != ''">
+          <if test="searchType == 'user_id'">
+            AND user_id LIKE CONCAT('%', #{searchValue}, '%')
+          </if>
+          <if test="searchType == 'title'">
+            AND title  LIKE CONCAT('%', #{searchValue}, '%')
+          </if>
+          <if test="searchType == 'content'">
+            AND content LIKE CONCAT('%', #{searchValue}, '%')
+          </if>
+        </if>
+      </trim>
+    </where>
+    ORDER BY emo_id DESC
+    LIMIT #{startRow}, #{pageSize}
+  </select>
+
+  <!-- 전체 개수 -->
+  <select id="totalcount" parameterType="java.util.Map" resultType="int">
+    SELECT COUNT(*) 
+    FROM tb_emotion
+    <where>
+      <trim prefix="" prefixOverrides="AND |OR ">
+        <if test="searchValue != null and searchValue != ''">
+          <if test="searchType eq 'user_id'">
+            AND user_id LIKE CONCAT('%', #{searchValue}, '%')
+          </if>
+          <if test="searchType == 'title'">
+            AND title  LIKE CONCAT('%', #{searchValue}, '%')
+          </if>
+          <if test="searchType == 'content'">
+            AND content LIKE CONCAT('%', #{searchValue}, '%')
+          </if>
+        </if>
+      </trim>
+    </where>
+  </select>
+
+</mapper>

@@ -1,4 +1,4 @@
-package kr.co.ictedu.teamcfinal.config;
+package com.evlink.domain;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

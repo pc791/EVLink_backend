@@ -1,5 +1,5 @@
 // src/main/java/kr/co/ictedu/teamcfinal/config/SecurityConfig.java
-package kr.co.ictedu.teamcfinal.config;
+package com.evlink.domain;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

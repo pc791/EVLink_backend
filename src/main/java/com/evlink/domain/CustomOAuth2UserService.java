@@ -1,4 +1,4 @@
-package kr.co.ictedu.teamcfinal.config;
+package com.evlink.domain;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;

@@ -1,5 +1,5 @@
 // src/main/java/kr/co/ictedu/teamcfinal/login/AuthController.java
-package kr.co.ictedu.teamcfinal.login;
+package com.evlink.domain.login.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
