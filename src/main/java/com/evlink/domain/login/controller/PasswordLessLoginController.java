@@ -3,11 +3,25 @@ package com.evlink.domain.login.controller;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,12 +38,15 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import com.evlink.domain.login.dao.AuthDao;
 import com.evlink.domain.login.service.PasswordLessLoginService;
 import com.evlink.domain.login.vo.PasswordLessUserInfoVO;
+import com.evlink.domain.login.vo.UserVO;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.crypto.Cipher;
@@ -43,10 +60,14 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/PLogin/")
 public class PasswordLessLoginController {
 	@Autowired
 	private PasswordLessLoginService plLoginService;
+	@Autowired
+	private AuthDao authDao;
+	private final SecurityContextRepository securityContextRepository;
 	
 	@Value("${passwordless.corpId}")
 	private String corpId;
@@ -100,10 +121,11 @@ public class PasswordLessLoginController {
 			PasswordLessUserInfoVO newUserinfo = plLoginService.checkPassword(userinfo);
 			
 			boolean exist = false;
+			// 2025.09.15
+			HttpSession session = request.getSession(true);
 			
 			if(newUserinfo != null) {
-				ModelMap modelMap = passwordlessCallApi("isApUrl", "userId=" + id, request, null);
-				System.out.println(modelMap);
+				ModelMap modelMap = passwordlessCallApi(session, request, null, "isApUrl", "userId=" + id);
 				if(modelMap != null) {
 					String result = (String) modelMap.getAttribute("result");
 					if(result.equals("OK")) {
@@ -128,7 +150,7 @@ public class PasswordLessLoginController {
 					mapResult.put("result", "패스워드로 로그인하고 싶다면\\nPasswordless 서비스를 먼저 해지하세요.");
 				}
 				else {
-					HttpSession session = request.getSession(true);
+					//HttpSession session = request.getSession(true); 2025.09.15
 					session.setAttribute("id", id);
 					
 					mapResult.put("result", "OK");
@@ -309,9 +331,11 @@ public class PasswordLessLoginController {
 	
 	@RequestMapping(value="/passwordlessCallApi")
 	public ModelMap passwordlessCallApi(
+			HttpSession session,
+			HttpServletRequest request, HttpServletResponse response,
 			@RequestParam(value = "url", required = false) String url,
-			@RequestParam(value = "params", required = false) String params,
-			HttpServletRequest request, HttpServletResponse response){
+			@RequestParam(value = "params", required = false) String params
+			){
 
 		ModelMap modelMap = new ModelMap();
 		String result = "";
@@ -326,7 +350,9 @@ public class PasswordLessLoginController {
 		String userId = "";
 		String userToken = "";
 		
-		HttpSession session = request.getSession();
+		// 2025.09.15
+		// HttpSession session = request.getSession();
+		session = request.getSession();
 		String sessionUserToken = (String) session.getAttribute("PasswordlessToken");
 		String sessionTime = (String) session.getAttribute("PasswordlessTime");
 		
@@ -468,6 +494,8 @@ public class PasswordLessLoginController {
 							userinfo.setLogin_id(userId);
 							userinfo.setLogin_pw(newPw);
 							plLoginService.changepw(userinfo);
+							userinfo.setUser_tp("USR001");
+							plLoginService.updateUserType(userinfo);
 					    }
 					}
 				}
@@ -496,10 +524,54 @@ public class PasswordLessLoginController {
 							userinfo.setLogin_id(userId);
 							userinfo.setLogin_pw(newPw);
 							plLoginService.changepw(userinfo);
-							
-							session.setAttribute("id", userId);
+							// 2025.09.16
+							Map<String, String> usrMap = new HashMap<>();
+							usrMap.put("login_id", newUserinfo.getLogin_id());
+					        usrMap.put("join_type", newUserinfo.getJoin_type());
+					        int userCnt = authDao.checkSignUp(usrMap);
+					        // System.out.println("userCnt >> "+userCnt);
+					        if(userCnt > 0) {
+					        	UserVO usrvo = authDao.getUserInfo(usrMap);
+					        	// System.out.println("usrvo >> "+usrvo.toString());
+					        	// login session 값 설정
+					        	Map<String, Object> std = new HashMap<>();
+					        	std.put("email", usrvo.getLogin_id());
+					            std.put("provider", "passwordless");
+					            std.put("userId", usrvo.getUser_id());
+					        	std.put("userTp", usrvo.getUser_tp());
+					        	
+					        	List<GrantedAuthority> roles = List.of(new SimpleGrantedAuthority("ROLE_USER"));
+					        	OAuth2User oAuth2User = new DefaultOAuth2User(roles, std, "email");
+					        	
+					        	String registrationId = "passwordless";
+					        	Authentication authToken = new OAuth2AuthenticationToken(oAuth2User, roles, registrationId);
+					        	((AbstractAuthenticationToken) authToken).setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+					        	
+					        	SecurityContext context = SecurityContextHolder.createEmptyContext();
+					        	context.setAuthentication(authToken);
+					        	SecurityContextHolder.setContext(context);
+					        	securityContextRepository.saveContext(context, request, response);
+					        }
+					        // end
 						}
 				    }
+				} catch(ParseException pe) {
+					pe.printStackTrace();
+				}
+			}
+			
+			// 패스워드리스 해지시
+			if(url.equals("withdrawalApUrl")) {
+				JSONParser parser = new JSONParser();
+				try {
+					JSONObject jsonResponse = (JSONObject)parser.parse(result);
+					boolean resultTag = (boolean) (jsonResponse).get("result");
+				    				    
+				    if(resultTag) {
+				    	userinfo.setUser_tp("USR005");
+						plLoginService.updateUserType(userinfo);
+				    }
+				    
 				} catch(ParseException pe) {
 					pe.printStackTrace();
 				}
@@ -509,7 +581,7 @@ public class PasswordLessLoginController {
 		}
 		
 		modelMap.put("data", result);
-
+		
 		return modelMap;
 	}
 	
@@ -590,4 +662,5 @@ public class PasswordLessLoginController {
  		}
  		return strRet;	
  	}
+	
 }

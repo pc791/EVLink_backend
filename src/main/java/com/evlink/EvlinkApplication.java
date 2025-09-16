@@ -31,7 +31,10 @@ public class EvlinkApplication {
 				        		"http://localhost:3001", 
 				        		"http://localhost:3000", 
 				        		"http://127.0.0.1:3001", 
-				        		"http://127.0.0.1:3000")
+				        		"http://127.0.0.1:3000",
+				        		"http://3.34.69.170:3000",
+				        		"http://3.34.69.170:3001"
+				        		)
 				        .allowedHeaders("*")
 				        .allowedMethods("*")
 				        .allowCredentials(true) // true로 설정해야 withCredentials 동작

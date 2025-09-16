@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.evlink.domain.event.dao.EventDao">
+
+
+  <select id="list" parameterType="map" resultType="eventvo">
+    SELECT
+      tb_event.event_id                                  AS eventId,
+      tb_event.title                                     AS title,
+      tb_event.content                                   AS content,
+      DATE_FORMAT(tb_event.start_dt, '%Y-%m-%d')         AS startDate,
+      DATE_FORMAT(tb_event.end_dt,   '%Y-%m-%d')         AS endDate,
+      tb_event.use_yn                                    AS useyn,
+      (
+        SELECT i.img_url
+        FROM tb_event_img i
+        WHERE i.event_id = tb_event.event_id
+        ORDER BY (CASE WHEN i.img_section = 'MAIN' THEN 0 ELSE 1 END), i.img_id DESC
+        LIMIT 1
+      )                                                  AS imageUrl
+    FROM tb_event
+    WHERE tb_event.use_yn = 'Y'
+    ORDER BY tb_event.start_dt DESC, tb_event.event_id DESC
+  </select>
+</mapper>

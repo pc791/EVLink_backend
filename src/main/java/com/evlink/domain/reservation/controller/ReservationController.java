@@ -116,7 +116,7 @@ public class ReservationController {
 	
 	@GetMapping("/list")
 	public Map<String, Object> galleryList(HttpSession session, HttpServletRequest request, @RequestParam Map<String, String> paramMap) {
-		System.out.println("Method =>" + request.getMethod());
+		// System.out.println("Method =>" + request.getMethod());
 		String cPage = paramMap.get("cPage");
 		int totalCnt = reservationService.totalCount(paramMap);
 		PageVO pageVO = getPageSet(cPage, totalCnt, 10);

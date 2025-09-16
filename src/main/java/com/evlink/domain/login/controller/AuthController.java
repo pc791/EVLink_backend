@@ -32,7 +32,6 @@ public class AuthController {
 
     @GetMapping("/kakao")
     public ResponseEntity<Map<String, String>> kakao() {
-    	System.out.println("전송");
         return ResponseEntity.ok(Map.of("url", ctxBase() + "/oauth2/authorization/kakao"));
     }
 
@@ -61,13 +60,18 @@ public class AuthController {
 
         // CustomOAuth2UserService에서 표준화된 속성: { email, provider }
         String email = (String) user.getAttributes().get("email");
+        // 2025.09.16
+        int userId = (Integer) user.getAttributes().get("userId");
+        String userTp = (String) user.getAttributes().get("userTp");
 
         body.put("isLoggedIn", true);   // ★ 프론트가 기대하는 정확한 키
         body.put("email", email);
         body.put("provider", provider);
         body.put("name", null);         // 필요 시 나중에 채우기 (지금은 null)
         body.put("profile", null);      // 필요 시 나중에 채우기 (지금은 null)
-
+        body.put("userId", userId);     // 2025.09.16
+        body.put("userTp", userTp);     // 2025.09.16
+        
         return ResponseEntity.ok(body);
     }
 

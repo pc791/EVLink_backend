@@ -23,4 +23,7 @@ public interface PasswordLessLoginDao {
     
     // Password Change
     void changepw(PasswordLessUserInfoVO userinfo);
+
+    // Update user type
+	void updateUserType(PasswordLessUserInfoVO userinfo);
 }

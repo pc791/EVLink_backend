@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.evlink.domain.login.dao.AuthDao">
+    <!-- Sign Check -->
+    <select id="checkSignUp" parameterType="map" resultType="int">
+        SELECT count(*)
+        FROM tb_user
+        WHERE login_id = #{login_id}
+          AND join_type = #{join_type}
+    </select>
+    
+    <insert id="signUp" parameterType="map">
+    	INSERT INTO tb_user (login_id, user_tp, join_type, reg_dt, reg_user)
+        VALUES(#{login_id}, "USR001", #{join_type}, sysdate(), #{login_id})
+    </insert>
+
+    <!-- login -->
+    <select id="getUserInfo" parameterType="map" resultType="usrvo">
+        SELECT user_id, user_tp, join_type, login_id, login_pw, user_nm, user_phone, user_nicknm, login_fail_cnt, access_token, refresh_token
+        FROM tb_user
+        WHERE login_id = #{login_id}
+    </select>
+        
+</mapper>

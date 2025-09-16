@@ -41,4 +41,9 @@ public class PasswordLessLoginService {
     public void changepw(PasswordLessUserInfoVO userinfo) {
     	plLoginDao.changepw(userinfo);
     }
+
+    // Update user type
+	public void updateUserType(PasswordLessUserInfoVO userinfo) {
+		plLoginDao.updateUserType(userinfo);
+	}
 }

@@ -16,5 +16,6 @@ public class PasswordLessUserInfoVO {
 	private String login_id;
 	private String login_pw;
 	private String join_type;
+	private String user_tp;
 	private Date reg_dt;
 }

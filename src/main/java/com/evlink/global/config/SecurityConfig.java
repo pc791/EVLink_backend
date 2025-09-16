@@ -4,8 +4,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.*;
 
@@ -22,7 +25,7 @@ public class SecurityConfig {
   private final OAuth2SuccessHandler oAuth2SuccessHandler;       // @Component 로 등록되어 있어야 함
 
   @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+  public SecurityFilterChain filterChain(HttpSecurity http, SecurityContextRepository repo) throws Exception {
     http
       .csrf(csrf -> csrf.disable())
       .cors(c -> c.configurationSource(corsConfigurationSource()))
@@ -36,6 +39,7 @@ public class SecurityConfig {
           "/api/auth/**",      // 세션조회/로그아웃 등 공개
           "/notice/**"
         ).permitAll()
+        .requestMatchers(HttpMethod.POST, "/api/PLogin/**").permitAll()
         // 나머지 API는 인증 필요
         .requestMatchers("/api/**").authenticated()
         // 기타는 필요에 따라 공개/보호 선택
@@ -57,7 +61,9 @@ public class SecurityConfig {
           (req, res, e) -> res.sendError(HttpServletResponse.SC_UNAUTHORIZED),
           new AntPathRequestMatcher("/api/**")
         )
-      );
+      )
+      // 저장소 명시
+      .securityContext(c -> c.securityContextRepository(repo));
 
     return http.build();
   }
@@ -68,8 +74,12 @@ public class SecurityConfig {
     cfg.setAllowedOrigins(List.of(
       "http://localhost:3000",
       "http://localhost:3001",
-      "http://192.168.0.90:3000",
-      "http://192.168.0.90:3001"
+//      "http://192.168.0.90:3000",
+//      "http://192.168.0.90:3001",
+      "http://127.0.0.1:3000",
+      "http://127.0.0.1:3001",
+      "http://3.34.69.170:3000",
+	  "http://3.34.69.170:3001"
     ));
     cfg.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
     cfg.setAllowedHeaders(List.of("Authorization","Content-Type","Accept"));
@@ -78,5 +88,11 @@ public class SecurityConfig {
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", cfg);
     return source;
+  }
+  
+  // 2025.09.16
+  @Bean
+  public SecurityContextRepository securityContextRepository() {
+      return new HttpSessionSecurityContextRepository();
   }
 }
