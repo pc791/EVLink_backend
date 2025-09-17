@@ -20,6 +20,7 @@
         SELECT user_id, user_tp, join_type, login_id, login_pw, user_nm, user_phone, user_nicknm, login_fail_cnt, access_token, refresh_token
         FROM tb_user
         WHERE login_id = #{login_id}
+          AND join_type = #{join_type}
     </select>
         
 </mapper>
