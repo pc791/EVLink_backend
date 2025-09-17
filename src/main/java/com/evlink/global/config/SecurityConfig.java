@@ -38,7 +38,8 @@ public class SecurityConfig {
           "/login/oauth2/**",
           "/api/auth/**",      // 세션조회/로그아웃 등 공개
           "/notice/**",
-          "/api/reservation/**"
+          "/api/reservation/**",
+          "/emotion/**"
         ).permitAll()
         .requestMatchers(HttpMethod.POST, "/api/PLogin/**").permitAll()
         // 나머지 API는 인증 필요

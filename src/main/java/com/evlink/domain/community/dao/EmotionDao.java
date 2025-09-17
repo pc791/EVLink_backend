@@ -20,19 +20,19 @@ public interface EmotionDao {
 
 	int totalcount(@Param("searchType") String searchType,@Param("searchValue") String searchValue);
 	
-	@Insert("INSERT INTO tb_board (user_id, title, content, emotion)VALUES (#{user_id}, #{title}, #{content}, #{emotion})")
+	@Insert("INSERT INTO tb_emotion (user_id, title, content, emotion)VALUES (#{user_id}, #{title}, #{content}, #{emotion})")
 	void insertContent(EmotionVO vo);
 	
-	@Select("select user_id, title, content, reg_dt, upd_dt from tb_board where board_id = #{board_id}")
+	@Select("select user_id, title, content, reg_dt, upd_dt from tb_emotion where emo_id = #{emo_id}")
 	EmotionVO showDetail(long emo_id);
 	
-	@Update("UPDATE tb_board SET hit = hit + 1 WHERE board_id = #{board_id}")
+	@Update("UPDATE tb_emotion SET hit = hit + 1 WHERE emo_id = #{emo_id}")
 	void uphit(long emo_id);
 	
-	@Update("update tb_board set title= #{title}, content=#{content} where board_id = #{board_id}")
+	@Update("update tb_emotion set title= #{title}, content=#{content} where emo_id = #{emo_id}")
 	void update(EmotionVO vo);
 	
-	@Delete("DELETE from tb_board where board_id=#{board_id}")
+	@Delete("DELETE from tb_emotion where emo_id=#{emo_id}")
 	void delete(long emo_id);
 	
 }
