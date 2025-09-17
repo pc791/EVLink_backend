@@ -26,4 +26,7 @@ public interface ReservationDao {
 	List<Map<String, Object>> reservationList(Map<String, String> map);
 
 	int totalCount(Map<String, String> map);
+	
+	// 예약된 시간 목록을 가져오는 메서드 추가
+	List<Map<String, Object>> getReservedTimes(@Param("chargerId") Long chargerId, @Param("date") String date);
 }

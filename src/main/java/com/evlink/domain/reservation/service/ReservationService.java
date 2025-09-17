@@ -2,6 +2,7 @@ package com.evlink.domain.reservation.service;
 
 import java.time.Duration;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -109,4 +110,83 @@ public class ReservationService {
 	public int totalCount(Map<String, String> map) {
 		return reservationDao.totalCount(map);
 	}
+	/**
+     * 특정 충전소의 특정 날짜에 대해 예약된 시간 목록을 반환합니다.
+     * 이 시간 목록은 프론트엔드에서 예약 불가능한 시간대를 표시하는 데 사용됩니다.
+     * @param chargerId 충전소 ID
+     * @param date      조회 날짜 (yyyy-MM-dd 형식)
+     * @return 예약된 시간(시 단위) 목록 (예: [9, 10, 11])
+     */
+	public List<Integer> getReservedTimes(Long chargerId, String date) {
+	    // 충전소 정보 조회
+	    ChargerVO chargerVO = chargerDao.getChargerById(chargerId);
+	    if (chargerVO == null) {
+	        throw new IllegalStateException("충전소 정보를 찾을 수 없습니다.");
+	    }
+	    
+	    LocalTime openTime = chargerVO.getOpenTime();
+	    LocalTime closeTime = chargerVO.getCloseTime();
+	    
+	    // 예약된 시간 범위 목록을 가져옵니다.
+	    List<Map<String, Object>> reservedRanges = reservationDao.getReservedTimes(chargerId, date);
+
+	    // 예약된 시간(시 단위) 목록을 생성합니다.
+	    List<Integer> reservedHours = new ArrayList<>();
+	    
+	    if (reservedRanges != null && !reservedRanges.isEmpty()) {
+	        for (Map<String, Object> range : reservedRanges) {
+	            if (range == null) {
+	                continue;
+	            }
+	            
+	            Object startTimeObj = range.get("res_start_time");
+	            Object endTimeObj = range.get("res_end_time");
+
+	            if (startTimeObj == null || endTimeObj == null) {
+	                continue;
+	            }
+
+	            LocalTime startTime;
+	            LocalTime endTime;
+	            
+	            if (startTimeObj instanceof java.sql.Time) {
+	                startTime = ((java.sql.Time) startTimeObj).toLocalTime();
+	            } else {
+	                startTime = (LocalTime) startTimeObj;
+	            }
+	            
+	            if (endTimeObj instanceof java.sql.Time) {
+	                endTime = ((java.sql.Time) endTimeObj).toLocalTime();
+	            } else {
+	                endTime = (LocalTime) endTimeObj;
+	            }
+
+	            while (startTime.isBefore(endTime)) {
+	                reservedHours.add(startTime.getHour());
+	                startTime = startTime.plusHours(1);
+	            }
+	        }
+	    }
+
+	    // 최종적으로 비활성화할 시간 목록을 계산합니다.
+	    List<Integer> finalDisabledHours = new ArrayList<>();
+	    
+	    // 0시부터 23시까지 모든 시간을 반복합니다.
+	    for (int i = 0; i < 24; i++) {
+	        LocalTime checkTime = LocalTime.of(i, 0);
+
+	        // 충전소 운영 시간을 벗어나는지 확인
+	        if (checkTime.isBefore(openTime) || checkTime.isAfter(closeTime.minusHours(1))) {
+	            finalDisabledHours.add(i);
+	        }
+	        
+	        // 예약된 시간인지 확인
+	        else if (reservedHours.contains(i)) {
+	            finalDisabledHours.add(i);
+	        }
+	    }	    
+	    return finalDisabledHours; // 비활성화할 시간 목록을 반환합니다.
+	}
+
 }
+

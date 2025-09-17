@@ -56,7 +56,7 @@
 		DELETE FROM tb_private_charger WHERE charger_id = #{chargerId}
 	</delete>
 	
-	<!-- 예약시 충전소 정보 가져오기 -->
+	<!-- 충전소 정보 가져오기 -->
     <select id="getChargerById" parameterType="long" resultType="charger">
 		SELECT
 		addr,

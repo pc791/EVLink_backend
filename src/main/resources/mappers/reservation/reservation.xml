@@ -112,5 +112,17 @@
              </choose>
         </where>
     </select>
+	<!-- 프론트 예약가능 시간 조회 -->
+	<select id="getReservedTimes" parameterType="map" resultType="map">
+		SELECT
+		res_start_time,
+		res_end_time
+		FROM
+		tb_reservation
+		WHERE
+		charger_id = #{chargerId}
+		AND res_date = #{date}
+		AND res_status = 'R'
+	</select>
     
 </mapper>

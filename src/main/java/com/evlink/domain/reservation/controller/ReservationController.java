@@ -114,6 +114,29 @@ public class ReservationController {
 		}
 	}
 	
+	// 특정 충전소의 특정 날짜에 대한 예약된 시간 조회
+    @GetMapping("/availability")
+    public ResponseEntity<Map<String, Object>> getAvailability(
+                @RequestParam("chargerId") Long chargerId,
+                @RequestParam("date") String date) {
+        
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            // Service 계층의 getReservedTimes 메서드 호출
+            List<Integer> reservedTimes = reservationService.getReservedTimes(chargerId, date);
+            
+            response.put("success", true);
+            response.put("data", reservedTimes); // List<Integer> 반환
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "예약된 시간 조회 중 오류가 발생했습니다: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+	
 	@GetMapping("/list")
 	public Map<String, Object> galleryList(HttpSession session, HttpServletRequest request, @RequestParam Map<String, String> paramMap) {
 		// System.out.println("Method =>" + request.getMethod());
